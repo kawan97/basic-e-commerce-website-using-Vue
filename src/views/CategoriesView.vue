@@ -20,23 +20,27 @@
         <div class="categories-sidebar">
           <h2 class="sidebar-title">Categories</h2>
           <ul class="categories-list">
-            <li 
+            <li
               class="category-item"
-              :class="{ 'active': selectedCategory === 0 }"
+              :class="{ active: selectedCategory === 0 }"
               @click="selectCategory(0)"
             >
               <span class="category-icon">🛒</span>
               <span class="category-name">All Products</span>
             </li>
-            <li 
-              v-for="category in categories" 
-              :key="category.id" 
+            <li
+              v-for="category in categories"
+              :key="category.id"
               class="category-item"
-              :class="{ 'active': selectedCategory === category.id }"
+              :class="{ active: selectedCategory === category.id }"
               @click="selectCategory(category.id)"
             >
               <div class="category-image-container">
-                <img :src="category.image" :alt="category.name" class="category-image" />
+                <img
+                  :src="category.image"
+                  :alt="category.name"
+                  class="category-image"
+                />
               </div>
               <span class="category-name">{{ category.name }}</span>
             </li>
@@ -46,23 +50,31 @@
         <!-- Products List -->
         <div class="products-container">
           <div class="products-header">
-            <h2 class="products-title">
-              {{ selectedCategoryName }} Products
-            </h2>
+            <h2 class="products-title">{{ selectedCategoryName }} Products</h2>
             <div v-if="productsLoading" class="products-loading">
               <div class="loader small"></div>
             </div>
           </div>
-          
+
           <div v-if="!productsLoading && productsError" class="error-container">
             <p class="error-message">{{ productsError }}</p>
-            <button @click="fetchProductsByCategory" class="retry-button">Try Again</button>
+            <button @click="fetchProductsByCategory" class="retry-button">
+              Try Again
+            </button>
           </div>
-          
+
           <div v-else-if="!productsLoading" class="products-grid">
-            <div v-for="product in products" :key="product.id" class="product-card">
+            <div
+              v-for="product in paginatedProducts"
+              :key="product.id"
+              class="product-card"
+            >
               <div class="product-image">
-                <img :src="product.images[0]" :alt="product.title" class="product-img" />
+                <img
+                  :src="product.images[0]"
+                  :alt="product.title"
+                  class="product-img"
+                />
               </div>
               <div class="product-info">
                 <h3 class="product-name">{{ product.title }}</h3>
@@ -73,8 +85,40 @@
             </div>
           </div>
 
-          <div v-if="!productsLoading && !productsError && products.length === 0" class="no-products">
+          <div
+            v-if="!productsLoading && !productsError && products.length === 0"
+            class="no-products"
+          >
             <p>No products found in this category.</p>
+          </div>
+
+          <!-- Pagination -->
+          <div v-if="totalPages > 1" class="pagination-controls">
+            <button
+              class="pagination-btn"
+              :disabled="currentPage === 1"
+              @click="currentPage--"
+            >
+              Previous
+            </button>
+
+            <button
+              v-for="page in totalPages"
+              :key="page"
+              class="pagination-btn"
+              :class="{ active: currentPage === page }"
+              @click="changePage(page)"
+            >
+              {{ page }}
+            </button>
+
+            <button
+              class="pagination-btn"
+              :disabled="currentPage === totalPages"
+              @click="currentPage++"
+            >
+              Next
+            </button>
           </div>
         </div>
       </div>
@@ -83,111 +127,116 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters } from "vuex";
 
 export default {
-  name: 'CategoriesPage',
+  name: "CategoriesPage",
   data() {
     return {
       categories: [],
       products: [],
-      selectedCategory: 0, // 0 means all products
+      selectedCategory: 0,
       loading: true,
       error: null,
       productsLoading: false,
-      productsError: null
+      productsError: null,
+      currentPage: 1,
+      itemsPerPage: 6,
     };
   },
   computed: {
-    ...mapGetters(['currentTheme']),
+    ...mapGetters(["currentTheme"]),
     selectedCategoryName() {
       if (this.selectedCategory === 0) {
-        return 'All';
+        return "All";
       }
-      const category = this.categories.find(cat => cat.id === this.selectedCategory);
-      return category ? category.name : '';
-    }
+      const category = this.categories.find(
+        (cat) => cat.id === this.selectedCategory
+      );
+      return category ? category.name : "";
+    },
+    paginatedProducts() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.products.slice(start, end);
+    },
+    totalPages() {
+      return Math.ceil(this.products.length / this.itemsPerPage);
+    },
   },
   methods: {
     async fetchCategories() {
       this.loading = true;
       this.error = null;
-      
+
       try {
-        const response = await fetch('https://api.escuelajs.co/api/v1/categories');
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch categories: ${response.status} ${response.statusText}`);
-        }
-        
+        const response = await fetch(
+          "https://api.escuelajs.co/api/v1/categories"
+        );
+        if (!response.ok)
+          throw new Error(`Failed to fetch categories: ${response.statusText}`);
         this.categories = await response.json();
-        
-        // After fetching categories, fetch all products initially
         await this.fetchAllProducts();
-        
       } catch (err) {
-        console.error('Error fetching categories:', err);
         this.error = `Failed to load categories: ${err.message}`;
       } finally {
         this.loading = false;
       }
     },
-    
     async fetchAllProducts() {
       this.productsLoading = true;
       this.productsError = null;
-      
+      this.currentPage = 1;
+
       try {
-        const response = await fetch('https://api.escuelajs.co/api/v1/products?limit=20');
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch products: ${response.status} ${response.statusText}`);
-        }
-        
+        const response = await fetch(
+          "https://api.escuelajs.co/api/v1/products?limit=100"
+        );
+        if (!response.ok)
+          throw new Error(`Failed to fetch products: ${response.statusText}`);
         this.products = await response.json();
-        
       } catch (err) {
-        console.error('Error fetching all products:', err);
         this.productsError = `Failed to load products: ${err.message}`;
       } finally {
         this.productsLoading = false;
       }
     },
-    
     async fetchProductsByCategory() {
-      if (this.selectedCategory === 0) {
-        return this.fetchAllProducts();
-      }
-      
       this.productsLoading = true;
       this.productsError = null;
-      
+      this.currentPage = 1;
+
       try {
-        const response = await fetch(`https://api.escuelajs.co/api/v1/products/?categoryId=${this.selectedCategory}`);
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch products: ${response.status} ${response.statusText}`);
+        if (this.selectedCategory === 0) {
+          await this.fetchAllProducts();
+          return;
         }
-        
+
+        const response = await fetch(
+          `https://api.escuelajs.co/api/v1/products/?categoryId=${this.selectedCategory}`
+        );
+        if (!response.ok)
+          throw new Error(`Failed to fetch products: ${response.statusText}`);
         this.products = await response.json();
-        
+        window.scrollTo({ top: 0, behavior: "smooth" }); // Scrolls to the top
       } catch (err) {
-        console.error(`Error fetching products for category ${this.selectedCategory}:`, err);
         this.productsError = `Failed to load products: ${err.message}`;
       } finally {
         this.productsLoading = false;
       }
     },
-    
     selectCategory(categoryId) {
       this.selectedCategory = categoryId;
       this.fetchProductsByCategory();
-    }
+    },
+    changePage(page) {
+      this.currentPage = page;
+      window.scrollTo({ top: 0, behavior: "smooth" }); // Scrolls to the top
+    },
   },
   created() {
-    // Fetch categories when component is created
     this.fetchCategories();
-  }
+  },
 };
 </script>
 
@@ -215,7 +264,8 @@ export default {
 }
 
 /* Loading and Error States */
-.loading-container, .error-container {
+.loading-container,
+.error-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -242,8 +292,12 @@ export default {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .error-message {
@@ -432,14 +486,14 @@ export default {
   .content-layout {
     flex-direction: row;
   }
-  
+
   .categories-sidebar {
     width: 250px;
     flex-shrink: 0;
     border-radius: 0;
     height: auto;
   }
-  
+
   .products-container {
     flex-grow: 1;
   }
@@ -449,7 +503,7 @@ export default {
   .products-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .product-image {
     height: 180px;
   }
@@ -637,5 +691,37 @@ export default {
 
 .dark .loader {
   border-top-color: #81c784;
+}
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.pagination-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: none;
+  background-color: #e0e0e0;
+  color: #333;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.pagination-btn:hover {
+  background-color: #c8e6c9;
+}
+
+.pagination-btn.active {
+  background-color: #2e7d32;
+  color: white;
+}
+
+.pagination-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 </style>
