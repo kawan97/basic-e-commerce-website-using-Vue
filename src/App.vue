@@ -1,9 +1,12 @@
 <template>
   <nav>
     <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+    <router-link to="/categories">Categories</router-link> |
+    <router-link to="/product-listing">Product Listing</router-link> |
+    <router-link to="/favorite">Favorite</router-link> |
+    <router-link to="/product/1">Product Detail</router-link> |
   </nav>
-  <router-view/>
+  <router-view />
 </template>
 
 <style>
