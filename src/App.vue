@@ -144,12 +144,7 @@ body {
   min-height: 100vh;
 }
 
-.container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
+
 
 /* Header & Navigation */
 .header {
@@ -196,7 +191,7 @@ body {
 }
 
 .menu-toggle {
-margin-right:15px;
+margin-right:25px;
   display: none;
   background: transparent;
   border: none;
@@ -277,6 +272,8 @@ margin-right:15px;
 
 /* Main Content */
 .main-content {
+  background-color: var(--body-bg);
+
   flex: 1;
   padding: 2rem 0;
 }
