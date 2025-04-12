@@ -38,6 +38,9 @@
                 >
                   Remove from Favorites
                 </button>
+                <router-link :to="`/product/${product.id}`" class="view-product-btn">
+                  View Product
+                </router-link>
               </div>
             </div>
           </div>
@@ -318,5 +321,18 @@ export default {
 
 .dark .remove-btn:hover {
   background-color: #e57373;
+}
+.view-product-btn{
+  background-color: #81c784;
+  color: #f5f5f5;
+  text-decoration: none;
+  text-align: center;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-top: 1rem;
 }
 </style>
