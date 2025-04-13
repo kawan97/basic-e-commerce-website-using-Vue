@@ -160,7 +160,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style >
 /* Base styles */
 .categories-page {
   padding: 2rem 0;

@@ -18,7 +18,7 @@
       <p class="product-price">${{ product.price.toFixed(2) }}</p>
       <p class="product-description">{{ product.description }}</p>
       <div class="product-actions">
-        <router-link :to="`/product/${product.id}`" class="view-details-btn">
+        <router-link :to="`/products/${product.id}`" class="view-details-btn">
           View Details
         </router-link>
         <button 

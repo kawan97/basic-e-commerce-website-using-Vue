@@ -1,7 +1,7 @@
 // store/modules/theme.js
 export default {
     state: {
-      theme: localStorage.getItem('theme') || 'light'
+      theme: localStorage.getItem('theme') || 'dark'
     },
     
     getters: {

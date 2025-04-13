@@ -60,13 +60,15 @@
             </div>
 
             <div class="product-actions">
-           
+              
               <router-link to="/" class="back-btn">
                 Back to Products
               </router-link>
             </div>
           </div>
         </div>
+        
+       
       </div>
 
       <div v-else class="not-found">
@@ -98,7 +100,11 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["currentTheme", "isFavorite"]),
+    ...mapGetters([
+      "currentTheme", 
+      "isFavorite",
+      "allRecentlyViewed" // Add the recently viewed getter
+    ]),
     productImages() {
       if (!this.product) {
         return [];
@@ -138,9 +144,22 @@ export default {
         return "Uncategorized";
       }
     },
+    recentlyViewedProducts() {
+      return this.allRecentlyViewed || [];
+    },
+    // Filter out the current product from recently viewed list
+    filteredRecentProducts() {
+      if (!this.product) return [];
+      return this.recentlyViewedProducts
+        .filter(item => item.id !== this.product.id)
+        .slice(0, 4); // Only show up to 4 recent products
+    }
   },
   methods: {
-    ...mapActions(["toggleFavorite"]),
+    ...mapActions([
+      "toggleFavorite",
+      "viewProduct" // Add the viewProduct action
+    ]),
     async fetchProduct() {
       this.loading = true;
       this.error = null;
@@ -156,6 +175,11 @@ export default {
         }
 
         this.product = await response.json();
+        
+        // Add product to recently viewed
+        if (this.product) {
+          this.addToRecentlyViewed();
+        }
       } catch (error) {
         this.error = error.message || "An error occurred";
       } finally {
@@ -165,6 +189,12 @@ export default {
     handleImageError() {
       this.imageError = true;
     },
+    addToRecentlyViewed() {
+      // Make sure product has all needed properties before adding to recently viewed
+      if (this.product && this.product.id) {
+        this.viewProduct(this.product);
+      }
+    }
   },
   created() {
     this.fetchProduct();

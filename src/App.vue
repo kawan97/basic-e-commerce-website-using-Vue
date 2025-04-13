@@ -24,7 +24,7 @@
             <div class="navbar-links">
               <router-link @click="closeMenu" to="/" class="nav-link">Home</router-link>
               <router-link @click="closeMenu" to="/categories" class="nav-link">Categories</router-link>
-              <router-link @click="closeMenu" to="/product-listing" class="nav-link">Products</router-link>
+              <router-link @click="closeMenu" to="/products" class="nav-link">Products</router-link>
               <router-link @click="closeMenu" to="/favorite" class="nav-link">
                 <span class="icon">❤️</span>
                 <span>Favorites</span>

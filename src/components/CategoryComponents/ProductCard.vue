@@ -9,7 +9,7 @@
       />
     </div>
     <div class="product-info">
-      <h3 class="product-name">{{ product.title }}</h3>
+      <router-link :to="`/products/${product.id}`" class="product-name">{{ product.title }}</router-link >
       <p class="product-price">${{ product.price.toFixed(2) }}</p>
       <p class="product-description">{{ product.description }}</p>
       <button 

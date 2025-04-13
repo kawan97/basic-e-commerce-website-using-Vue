@@ -38,7 +38,7 @@
                 >
                   Remove from Favorites
                 </button>
-                <router-link :to="`/product/${product.id}`" class="view-product-btn">
+                <router-link :to="`/products/${product.id}`" class="view-product-btn">
                   View Product
                 </router-link>
               </div>

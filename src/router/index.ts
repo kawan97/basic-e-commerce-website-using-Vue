@@ -17,12 +17,12 @@ const routes: Array<RouteRecordRaw> = [
     component: CategoriesView,
   },
   {
-    path: "/product/:id",
+    path: "/products/:id",
     name: "product-detail",
     component: ProductDetailView,
   },
   {
-    path: "/product-listing",
+    path: "/products",
     name: "product-listing",
     component: ProductListingView,
   },
